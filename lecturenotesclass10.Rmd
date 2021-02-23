@@ -84,6 +84,9 @@ Suppose we draw a single marble from our imaginary box, where all the marbles
 are equally likely to be selected. What is the probability the marble is blue? 
 How about white?
 
+There is a 3 / 8 (37.5%) of pulling a blue, and a 1 / 8 (12/5%) of pulling a
+white.
+
 We can simulate this "drawing" with the `sample()` function.
 
 ```{r sample}
@@ -108,7 +111,10 @@ counts <- table(draw_results)
 prop.table(counts)
 ```
 
-How close is this value to the "true" probability?
+How close is this value to the "true" probability? 
+
+It is almost spot on! 12.49% approximately equals 12.5%, especially if you
+round!
 
 **To summarize our process:**
 
@@ -125,6 +131,8 @@ color if we make two draws with replacement? We haven't discussed how to
 compute this theoretically yet, but this is what computers are good at.
 
 Before we do this, what is your guess as to what the probability will be?
+
+Whatever the probability of drawing the color once squared. 
 
 We'll still use `sample()` to run our simulation many times, but we'll
 use `dplyr` functions to compute the relative frequencies.
@@ -165,16 +173,31 @@ Perform a simulation to compute this empirical probability.
 
 Write down your guess to the answer before you calculate it.
 
-```{r simulate_rolls}
+I think the first option is more likely because it has more routes to get there
+(6 options vs 4 options)
 
+```{r simulate_rolls}
+dice <- c(1, 2, 3, 4, 5, 6)
+two_roll_results <- tibble(
+  roll_1 = sample(dice, size = 10000, replace = TRUE),
+  roll_2 = sample(dice, size = 10000, replace = TRUE)
+)
 ```
 
 ```{r identify_events}
-
+two_roll_results1 <- two_roll_results %>% 
+  mutate(roll_match = roll_1 == roll_2)
+two_roll_results2 <- two_roll_results %>%
+  mutate(roll_right = (4 == (roll_1 - roll_2)) | (4 == (roll_2 - roll_1)))
 ```
 
 ```{r summarize_rolls}
-
+two_roll_results1 %>% 
+  count(roll_match) %>% 
+  mutate(proportion = n / sum(n))
+two_roll_results2 %>%
+  count(roll_right) %>%
+  mutate(proportion = n / sum(n))
 ```
 
 ## Additional Resources-please look at before Weds.
